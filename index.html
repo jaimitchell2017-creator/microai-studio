@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#070a12">
+  <title>MicroAI Studio</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"><span></span><span></span><span></span></div>
+      <div>
+        <div class="brand-name">MicroAI <b>Studio</b></div>
+        <div class="brand-sub">AI × micro:bit playground</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div id="connectionPill" class="status-pill"><i></i><span>Cloud offline</span></div>
+      <button id="authButton" class="ghost-btn">Sign in</button>
+      <button id="newProjectBtn" class="primary-btn">＋ New project</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section id="authCard" class="auth-card hidden">
+      <div>
+        <div class="eyebrow">ACCOUNT</div>
+        <h2 id="authTitle">Sign in to sync your studio</h2>
+        <p>Projects are stored in your private Supabase account and can follow you between devices.</p>
+      </div>
+      <form id="authForm" class="auth-form">
+        <input id="authEmail" type="email" placeholder="Email address" autocomplete="email" required>
+        <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" minlength="6" required>
+        <input id="authName" class="signup-only" type="text" placeholder="Display name">
+        <div class="auth-row">
+          <button id="authSubmit" class="primary-btn" type="submit">Sign in</button>
+          <button id="toggleAuthMode" class="text-btn" type="button">Create account</button>
+          <button id="closeAuth" class="text-btn" type="button">Not now</button>
+        </div>
+      </form>
+      <div id="authMessage" class="small-message"></div>
+    </section>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">BUILD • TRAIN • CONNECT</div>
+        <h1>Teach an AI.<br><span>Bring it to life.</span></h1>
+        <p>Turn a Teachable Machine image model into a real-time micro:bit controller — then ask AI to help you build, explain and extend the project.</p>
+        <div class="hero-actions">
+          <button id="scrollStudioBtn" class="primary-btn big">Start building <span>→</span></button>
+          <button id="demoBtn" class="secondary-btn big">Load demo project</button>
+        </div>
+      </div>
+      <div class="hero-orbit">
+        <div class="orbit orbit-1"></div>
+        <div class="orbit orbit-2"></div>
+        <div class="core">
+          <div class="core-face">☺</div>
+          <div class="core-label">MICRO<br><b>AI</b></div>
+        </div>
+        <div class="orb orb-a">AI</div>
+        <div class="orb orb-b">BT</div>
+        <div class="orb orb-c">TM</div>
+      </div>
+    </section>
+
+    <section class="workspace" id="studio">
+      <aside class="sidebar">
+        <div class="side-title">WORKSPACE</div>
+        <button class="nav-item active" data-panel="lab"><span>◈</span> AI Lab</button>
+        <button class="nav-item" data-panel="projects"><span>▣</span> Projects <b id="projectCount">0</b></button>
+        <button class="nav-item" data-panel="code"><span>⌘</span> Code</button>
+        <button class="nav-item" data-panel="assistant"><span>✦</span> AI Assistant</button>
+        <button class="nav-item" data-panel="instructions"><span>?</span> How it works</button>
+        <div class="sidebar-bottom">
+          <div class="mini-card">
+            <span class="mini-dot"></span>
+            <div><b id="userLabel">Local mode</b><small id="userSub">Sign in for cloud sync</small></div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div id="panel-lab" class="panel active">
+          <div class="panel-head">
+            <div><div class="eyebrow">AI LAB</div><h2>Vision → Action</h2></div>
+            <div class="head-actions">
+              <button id="saveProjectBtn" class="secondary-btn">Save project</button>
+              <button id="connectBitBtn" class="primary-btn">Connect micro:bit</button>
+            </div>
+          </div>
+
+          <div class="grid-main">
+            <article class="glass camera-card">
+              <div class="card-head">
+                <div><span class="step">01</span><div><h3>Camera + model</h3><p>Paste your Teachable Machine model URL.</p></div></div>
+                <span id="modelStatus" class="badge neutral">Not loaded</span>
+              </div>
+              <div class="model-input-row">
+                <input id="modelUrl" type="url" placeholder="https://teachablemachine.withgoogle.com/models/..." spellcheck="false">
+                <button id="loadModelBtn" class="secondary-btn">Load model</button>
+              </div>
+              <div class="camera-wrap">
+                <video id="camera" autoplay playsinline muted></video>
+                <div id="cameraPlaceholder" class="camera-placeholder">
+                  <div class="camera-icon">◉</div>
+                  <b>Camera ready</b>
+                  <span>Load a model, then start the camera.</span>
+                </div>
+                <div id="cameraOverlay" class="camera-overlay"><span id="liveDot"></span><span id="cameraState">IDLE</span></div>
+              </div>
+              <div class="camera-actions">
+                <button id="startCameraBtn" class="primary-btn">Start camera</button>
+                <button id="stopCameraBtn" class="secondary-btn">Stop</button>
+              </div>
+            </article>
+
+            <article class="glass prediction-card">
+              <div class="card-head">
+                <div><span class="step">02</span><div><h3>Live prediction</h3><p>Highest-confidence class.</p></div></div>
+              </div>
+              <div class="prediction-hero">
+                <div id="predictionEmoji" class="prediction-emoji">◌</div>
+                <div class="prediction-name" id="predictionName">Waiting…</div>
+                <div class="confidence-track"><span id="confidenceBar"></span></div>
+                <div class="confidence-meta"><b id="confidenceValue">0%</b><span>confidence</span></div>
+              </div>
+              <div id="classList" class="class-list"></div>
+              <div class="prediction-footer"><span id="lastAction">No action sent</span><button id="sendNowBtn" class="text-btn">Send mapped action</button></div>
+            </article>
+          </div>
+
+          <div class="grid-bottom">
+            <article class="glass mapping-card">
+              <div class="card-head">
+                <div><span class="step">03</span><div><h3>Class → micro:bit action</h3><p>Choose what each class should do.</p></div></div>
+                <button id="addMappingBtn" class="text-btn">＋ Add</button>
+              </div>
+              <div id="mappingList" class="mapping-list"></div>
+            </article>
+
+            <article class="glass bit-card">
+              <div class="card-head">
+                <div><span class="step">04</span><div><h3>micro:bit link</h3><p>Bluetooth UART output.</p></div></div>
+                <span id="bitStatus" class="badge neutral">Disconnected</span>
+              </div>
+              <div class="bit-visual">
+                <div class="microbit-board">
+                  <div class="mb-screen"><span id="mbFace">☺</span></div>
+                  <div class="mb-leds"></div>
+                  <div class="mb-logo">micro:bit</div>
+                </div>
+                <div class="bit-info">
+                  <b id="bitName">No device connected</b>
+                  <span>Web Bluetooth UART</span>
+                  <small id="bitCommand">Waiting for command…</small>
+                </div>
+              </div>
+              <div class="bit-actions">
+                <button id="disconnectBitBtn" class="secondary-btn">Disconnect</button>
+                <button id="clearBitBtn" class="secondary-btn">Clear display</button>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div id="panel-projects" class="panel">
+          <div class="panel-head"><div><div class="eyebrow">CLOUD</div><h2>Your projects</h2></div><button id="refreshProjectsBtn" class="secondary-btn">Refresh</button></div>
+          <div id="projectsGrid" class="projects-grid"></div>
+        </div>
+
+        <div id="panel-code" class="panel">
+          <div class="panel-head"><div><div class="eyebrow">CODE LAB</div><h2>Generated micro:bit code</h2></div><div class="code-tabs"><button class="code-tab active" data-code="makecode">MakeCode JavaScript</button><button class="code-tab" data-code="python">MicroPython</button></div></div>
+          <div class="code-editor">
+            <div class="code-top"><span>microai-project</span><button id="copyCodeBtn" class="secondary-btn">Copy</button></div>
+            <pre id="codeOutput"></pre>
+          </div>
+          <div class="code-note">The generated program listens for simple commands such as <code>HAPPY</code>, <code>SAD</code>, <code>MAYBE</code> and <code>CLEAR</code> over Bluetooth UART.</div>
+        </div>
+
+        <div id="panel-assistant" class="panel">
+          <div class="panel-head"><div><div class="eyebrow">SERVER AI</div><h2>MicroAI Assistant</h2></div><span class="badge glow">OpenAI via Edge Function</span></div>
+          <div class="assistant-layout">
+            <div id="chatMessages" class="chat-messages"><div class="chat-msg ai"><div class="avatar">✦</div><div><b>MicroAI</b><p>I'm ready. Ask me to explain your model, improve your micro:bit project, generate code, or troubleshoot a Bluetooth problem.</p></div></div></div>
+            <form id="chatForm" class="chat-input"><textarea id="chatInput" rows="2" placeholder="Ask MicroAI anything about this project…"></textarea><button class="primary-btn" type="submit">Send ↗</button></form>
+            <div class="assistant-hints"><button data-prompt="Explain how the Teachable Machine → micro:bit pipeline works.">Explain the pipeline</button><button data-prompt="Write a simple micro:bit idea using HAPPY, SAD and MAYBE commands.">Make an idea</button><button data-prompt="Help me troubleshoot Web Bluetooth micro:bit connection problems.">Troubleshoot Bluetooth</button></div>
+          </div>
+        </div>
+
+        <div id="panel-instructions" class="panel">
+          <div class="panel-head"><div><div class="eyebrow">QUICK START</div><h2>How MicroAI Studio works</h2></div></div>
+          <div class="steps-grid">
+            <div class="instruction-card"><span>01</span><h3>Train</h3><p>Use Google Teachable Machine to train image classes such as HAPPY, SAD and MAYBE.</p></div>
+            <div class="instruction-card"><span>02</span><h3>Load</h3><p>Paste the model URL into AI Lab. MicroAI Studio loads the model directly in your browser.</p></div>
+            <div class="instruction-card"><span>03</span><h3>See</h3><p>Start the camera. Predictions and confidence update live without sending camera frames to the server.</p></div>
+            <div class="instruction-card"><span>04</span><h3>Map</h3><p>Map each class to a micro:bit command. The default examples use HAPPY, SAD, MAYBE and CLEAR.</p></div>
+            <div class="instruction-card"><span>05</span><h3>Connect</h3><p>Flash the generated Bluetooth UART program to your micro:bit, then connect from a compatible Chrome/Edge browser.</p></div>
+            <div class="instruction-card"><span>06</span><h3>Build with AI</h3><p>Sign in to sync projects and use the server-side OpenAI assistant without exposing your API key.</p></div>
+          </div>
+          <div class="compat-note"><b>Browser note:</b> Web Bluetooth generally requires a supported Chromium browser and a secure context such as HTTPS. GitHub Pages is suitable for the frontend.</div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
